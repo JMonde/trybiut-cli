@@ -1,0 +1,45 @@
+{
+  "name": "trybiut-cli",
+  "version": "0.1.0",
+  "description": "TryBiut CLI — manage taxes, invoices, movements and reports from the terminal. Secure token storage, no password ever saved.",
+  "type": "module",
+  "bin": {
+    "trybiut": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "assets"
+  ],
+  "keywords": [
+    "trybiut",
+    "cli",
+    "taxes",
+    "autonomos",
+    "freelance",
+    "invoices"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JMonde/trybiut-cli.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsx": "^4.7.1",
+    "typescript": "^5"
+  }
+}
