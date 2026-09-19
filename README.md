@@ -26,9 +26,10 @@ After `npm publish`, this becomes `npx -y trybiut-cli` / `npm i -g trybiut-cli`.
 
 ```bash
 # 1. Create your account
-open https://trybiut.com/get-started
+open https://trybiut.com/onboarding/chat
 
 # 2. Log in (stores a local token, password is not saved)
+#    or create a long-lived token at https://trybiut.com/dashboard/integrations
 npx -y github:JMonde/trybiut-cli login
 
 # 3. Verify
