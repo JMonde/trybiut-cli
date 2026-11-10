@@ -1,27 +1,42 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
+import { exec } from 'node:child_process';
 import { loadConfig, saveConfig, clearToken, configPath } from './config.js';
 import { TrybiutClient } from './client.js';
-import { supabaseLogin, supabaseLogout } from './supabase.js';
-import { prompt, promptHidden } from './prompt.js';
+import { supabaseLogout } from './supabase.js';
+import { promptHidden } from './prompt.js';
 
 const program = new Command();
-program.name('trybiut').description('TryBiut CLI — taxes, invoices, movements and reports').version('0.1.0');
+program.name('trybiut').description('TryBiut CLI — taxes, invoices, movements and reports').version('0.2.0');
 
 function printJson(data: unknown) { console.log(JSON.stringify(data, null, 2)); }
 function die(msg: string, code = 1): never { console.error(msg); process.exit(code); }
 
-program.command('login').description('Log in and store a local session token (password is never saved)').action(async () => {
+function tryOpenUrl(url: string): void {
+  const cmd = process.platform === 'win32' ? `start "" "${url}"` : process.platform === 'darwin' ? `open "${url}"` : `xdg-open "${url}"`;
+  exec(cmd, () => {});
+}
+
+program.command('login').description('Log in with a browser link (paste token, no password)').option('--token <token>', 'Token (non-interactive, useful for CI)').option('--no-open', 'Do not try to open the browser automatically').action(async (opts) => {
   const cfg = loadConfig();
-  const email = await prompt('Email: ');
-  if (!email || !email.includes('@')) die('Invalid email.');
-  const password = await promptHidden('Password: ');
-  if (!password) die('Password required.');
-  console.log('Authenticating...');
-  const res = await supabaseLogin(email, password, cfg);
-  saveConfig({ token: res.access_token, tokenType: res.token_type, expiresAt: res.expires_in ? Date.now() + res.expires_in * 1000 : undefined });
+  const integrationsUrl = `${cfg.baseUrl.replace(/\/+$/, '')}/dashboard/integrations`;
+  let token = String(opts.token ?? '').trim();
+  if (!token) {
+    console.log('1. Create your account (if needed): https://trybiut.com/onboarding/chat');
+    console.log(`2. Open this link and copy your token:\n   ${integrationsUrl}`);
+    if (opts.open) tryOpenUrl(integrationsUrl);
+    token = (await promptHidden('Paste token: ')).trim().replace(/^Bearer\s+/i, '');
+  }
+  if (!token || token.length < 20) die('Invalid token. Copy the full token from the link above.');
+  console.log('Verifying...');
+  const client = new TrybiutClient(cfg.baseUrl, token);
+  try {
+    await client.request('/api/user/debug');
+  } catch (err) {
+    die(`Token rejected: ${err instanceof Error ? err.message : String(err)}`);
+  }
+  saveConfig({ token, tokenType: 'Bearer', expiresAt: undefined });
   console.log(`Logged in. Token saved to ${configPath()} (mode 600).`);
-  console.log(`Token: ${res.access_token.slice(0, 8)}*** (use --show-token with 'config' to display)`);
   console.log('Next: trybiut me');
 });
 

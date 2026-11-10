@@ -28,8 +28,8 @@ After `npm publish`, this becomes `npx -y trybiut-cli` / `npm i -g trybiut-cli`.
 # 1. Create your account
 open https://trybiut.com/onboarding/chat
 
-# 2. Log in (stores a local token, password is not saved)
-#    or create a long-lived token at https://trybiut.com/dashboard/integrations
+# 2. Log in with a browser link (no password in the terminal)
+#    Opens https://trybiut.com/dashboard/integrations — copy the token and paste it
 npx -y github:JMonde/trybiut-cli login
 
 # 3. Verify
@@ -46,7 +46,7 @@ npx -y github:JMonde/trybiut-cli calendar --year 2026
 
 | Command | Auth | Description |
 |---|---|---|
-| `login` | no | Authenticate and save token |
+| `login [--token TOKEN] [--no-open]` | no | Open the integrations link, paste token and save it |
 | `logout` | — | Clear local token |
 | `config [--show-token] [--set-base-url URL]` | — | Show or set config |
 | `status` | no | API health check |
@@ -64,7 +64,7 @@ npx -y github:JMonde/trybiut-cli calendar --year 2026
 
 ## Security
 
-- Password is used once to obtain a Supabase session token, then discarded.
+- No password is ever asked or stored. `login` opens the browser link, you paste a token.
 - Token is stored at `~/.config/trybiut/config.json` (Windows: `%APPDATA%/trybiut/config.json`) with mode `600`.
 - Private commands refuse to run without a token and never send data anonymously.
 - Use `TRYBIUT_API_TOKEN` env var to override the stored token (useful for CI).

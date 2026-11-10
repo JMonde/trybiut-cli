@@ -1,6 +1,6 @@
 {
   "name": "trybiut-cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TryBiut CLI — manage taxes, invoices, movements and reports from the terminal. Secure token storage, no password ever saved.",
   "type": "module",
   "bin": {
@@ -30,6 +30,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "smoke": "node scripts/smoke.mjs"
